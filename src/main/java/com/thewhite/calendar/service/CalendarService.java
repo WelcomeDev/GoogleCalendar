@@ -3,17 +3,17 @@ package com.thewhite.calendar.service;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
+import com.thewhite.calendar.mapper.GoogleDateMapper;
+import com.thewhite.calendar.service.arguments.CreateEventArguments;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 public class CalendarService {
 
     private final Calendar calendarService;
+
+    private final GoogleDateMapper dateMapper;
 
     @SneakyThrows
     public List<Event> getEvents() {
@@ -34,6 +36,7 @@ public class CalendarService {
                                        .setOrderBy("startTime")
                                        .setSingleEvents(true)
                                        .execute();
+
         return events.getItems();
     }
 
@@ -44,6 +47,8 @@ public class CalendarService {
         FreeBusyRequest freeBusyRequest = new FreeBusyRequest();
         freeBusyRequest.setTimeMin(now);
         CalendarList calendarList = calendarService.calendarList().list().execute();
+
+        calendarList.getItems().forEach(calendarListEntry -> log.info("Calendar id: {}", calendarListEntry.getId()));
 
         // обязательно указать календарь
         freeBusyRequest.setItems(calendarList.getItems().stream()
@@ -72,6 +77,38 @@ public class CalendarService {
         }
 
         return timePeriods;
+    }
+
+    public Event create(CreateEventArguments arguments) throws IOException {
+//        EventReminder[] reminderOverrides = new EventReminder[]{
+//                new EventReminder().setMethod("email").setMinutes(2 * 60),
+//                new EventReminder().setMethod("popup").setMinutes(10),
+//        };
+
+        EventAttendee[] attendees = new EventAttendee[]{
+                new EventAttendee()
+                        .setEmail("fedor.ishchenko.18@gmail.com")
+                        .setComment("Myself duplication")
+                        .set("telegramId", "https://t.me/FedorIshchenko18"),
+        };
+
+        // todo: fix error on create
+        Event event = new Event()
+                .setSummary(arguments.getTitle())
+                .setLocation("KHV, Komsomolskaya street 73")
+                .setDescription(arguments.getDescription())
+                .setStart(new EventDateTime().setDate(dateMapper.fromLocalDateTime(arguments.getTimeFrom()))
+                                             .setTimeZone("Russia/Vladivostok"))
+                .setEnd(new EventDateTime().setDate(dateMapper.fromLocalDateTime(arguments.getTimeTo()))
+                                           .setTimeZone("Russia/Vladivostok"))
+//                .setReminders(new Event.Reminders().setUseDefault(false)
+//                                                   .setOverrides(Arrays.asList(reminderOverrides)))
+                .setAttendees(Arrays.asList(attendees))
+                .set("Joyful", true);
+
+        return calendarService.events()
+                              .insert(arguments.getCalendarId(), event)
+                              .execute();
     }
 
 }

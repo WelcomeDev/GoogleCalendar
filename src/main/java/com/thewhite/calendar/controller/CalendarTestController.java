@@ -10,16 +10,15 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.thewhite.calendar.service.CalendarService;
+import com.thewhite.calendar.service.arguments.CreateEventArguments;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +55,11 @@ public class CalendarTestController {
     @GetMapping("events")
     public List<Event> getEvents() throws Exception {
         return calendarService.getEvents();
+    }
+
+    @PostMapping("event/create")
+    public Event createEvent(@RequestBody CreateEventArguments dto) throws Exception {
+        return calendarService.create(dto);
     }
 
 }
