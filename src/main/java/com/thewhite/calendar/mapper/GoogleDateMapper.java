@@ -1,6 +1,7 @@
 package com.thewhite.calendar.mapper;
 
 import com.google.api.client.util.DateTime;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -18,13 +19,17 @@ import java.util.TimeZone;
  * @author Fedor Ishchenko
  */
 @Component
+@Slf4j
 public class GoogleDateMapper {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     public DateTime fromLocalDateTime(LocalDateTime value) {
-        // todo: это можно попробовать взять из календаря
-        return DateTime.parseRfc3339(value.format(DATE_TIME_FORMATTER));
+        String zoned = ZonedDateTime.ofInstant(value, ZoneOffset.UTC, ZoneId.systemDefault())
+                                    .format(DATE_TIME_FORMATTER)
+                                    .toString();
+        log.info(zoned);
+        return DateTime.parseRfc3339(zoned);
     }
 
 }

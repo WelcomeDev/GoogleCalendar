@@ -85,25 +85,27 @@ public class CalendarService {
 //                new EventReminder().setMethod("popup").setMinutes(10),
 //        };
 
-        EventAttendee[] attendees = new EventAttendee[]{
-                new EventAttendee()
-                        .setEmail("fedor.ishchenko.18@gmail.com")
-                        .setComment("Myself duplication")
-                        .set("telegramId", "https://t.me/FedorIshchenko18"),
-        };
+//        EventAttendee[] attendees = new EventAttendee[]{
+//                new EventAttendee()
+//                        .setEmail("fedor.ishchenko.18@gmail.com")
+//                        .setComment("Myself duplication")
+//                        .set("telegramId", "https://t.me/FedorIshchenko18"),
+//        };
 
         // todo: fix error on create
         Event event = new Event()
                 .setSummary(arguments.getTitle())
-                .setLocation("KHV, Komsomolskaya street 73")
+//                .setLocation("KHV, Komsomolskaya street 73")
                 .setDescription(arguments.getDescription())
                 .setStart(new EventDateTime().setDate(dateMapper.fromLocalDateTime(arguments.getTimeFrom()))
                                              .setTimeZone("Russia/Vladivostok"))
                 .setEnd(new EventDateTime().setDate(dateMapper.fromLocalDateTime(arguments.getTimeTo()))
                                            .setTimeZone("Russia/Vladivostok"))
+//                .setStart(new EventDateTime().setDate(new DateTime("2022-05-28T09:00:00+10:00")).setTimeZone("Russia/Vladivostok"))
+//                .setEnd(new EventDateTime().setDate(new DateTime("2022-05-28T11:00:00+10:00")).setTimeZone("Russia/Vladivostok"))
 //                .setReminders(new Event.Reminders().setUseDefault(false)
 //                                                   .setOverrides(Arrays.asList(reminderOverrides)))
-                .setAttendees(Arrays.asList(attendees))
+//                .setAttendees(Arrays.asList(attendees))
                 .set("Joyful", true);
 
         return calendarService.events()
